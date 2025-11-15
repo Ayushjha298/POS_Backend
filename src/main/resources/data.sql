@@ -48,12 +48,14 @@ VALUES
 (3, 'La Pinoz Pizza', 'Bangalore', '7777777777');
 
 -- 🍕 FOOD ITEMS
-INSERT INTO food_items (id, name, description, price, store_id)
+-- 🍕 FOOD ITEMS (Soft Delete Enabled)
+INSERT INTO food_items (id, name, description, price, store_id, is_deleted)
 VALUES
-(1, 'Cheese Burst Pizza', 'Loaded with cheese and crust', 499.99, 1),
-(2, 'Veggie Paradise', 'Topped with onion, capsicum, tomato', 399.99, 1),
-(3, 'Chicken Supreme', 'Delicious chicken and cheese', 599.99, 2),
-(4, 'Margherita', 'Classic cheese and tomato pizza', 299.99, 3);
+(1, 'Cheese Burst Pizza', 'Loaded with cheese and crust', 499.99, 1, false),
+(2, 'Veggie Paradise', 'Topped with onion, capsicum, tomato', 399.99, 1, false),
+(3, 'Chicken Supreme', 'Delicious chicken and cheese', 599.99, 2, false),
+(4, 'Margherita', 'Classic cheese and tomato pizza', 299.99, 3, false);
+
 
 -- 📦 ORDERS
 INSERT INTO orders (id, order_date, status, user_id)

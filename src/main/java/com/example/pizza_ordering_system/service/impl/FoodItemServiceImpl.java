@@ -23,9 +23,8 @@ public class FoodItemServiceImpl implements FoodItemService {
 
     @Override
     public List<FoodItem> getAllFoodItems() {
-        return foodItemRepository.findAll();
+        return foodItemRepository.findByIsDeletedFalse();
     }
-
     @Override
     public FoodItem updateFoodItem(Long id, FoodItem updatedItem) {
         FoodItem existing = foodItemRepository.findById(id)
@@ -39,6 +38,12 @@ public class FoodItemServiceImpl implements FoodItemService {
 
     @Override
     public void deleteFoodItem(Long id) {
-        foodItemRepository.deleteById(id);
+        FoodItem item = foodItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Food item not found"));
+
+        item.setDeleted(true);   // 👈 Soft delete
+        foodItemRepository.save(item);
     }
+
+
 }

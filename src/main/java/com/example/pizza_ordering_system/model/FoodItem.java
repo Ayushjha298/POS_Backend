@@ -1,5 +1,6 @@
 package com.example.pizza_ordering_system.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,7 +16,7 @@ public class FoodItem {
     private String name;
     private String description;
     private BigDecimal price;
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
@@ -23,9 +24,14 @@ public class FoodItem {
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
+    private boolean isDeleted = false;
+
     // ---- Constructors ----
     public FoodItem() {
     }
+
+    public boolean isDeleted() { return isDeleted; }
+    public void setDeleted(boolean deleted) { isDeleted = deleted; }
 
     public FoodItem(Long id, String name, String description, BigDecimal price, Store store, List<OrderItem> orderItems) {
         this.id = id;

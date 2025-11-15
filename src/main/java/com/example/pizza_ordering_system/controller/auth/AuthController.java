@@ -75,6 +75,7 @@ public class AuthController {
             // ✅ Include both token and role in response
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("token", token);
+            responseData.put("id", user.getId());
             responseData.put("role", user.getRole());
             responseData.put("name", user.getName());
 

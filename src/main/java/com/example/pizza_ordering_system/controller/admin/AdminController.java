@@ -1,5 +1,6 @@
 package com.example.pizza_ordering_system.controller.admin;
 
+import com.example.pizza_ordering_system.dto.FoodItemDTO;
 import com.example.pizza_ordering_system.model.FoodItem;
 import com.example.pizza_ordering_system.model.Order;
 import com.example.pizza_ordering_system.model.Store;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -69,10 +71,24 @@ public class AdminController {
     }
 
     @GetMapping("/food-items")
-    public ResponseEntity<ApiResponse<List<FoodItem>>> getAllFoodItems() {
+    public ResponseEntity<ApiResponse<List<FoodItemDTO>>> getAllFoodItems() {
         List<FoodItem> items = foodItemService.getAllFoodItems();
-        return ResponseEntity.ok(new ApiResponse<>(200, items, "Food items fetched successfully"));
+
+        List<FoodItemDTO> dtoList = items.stream()
+                .map(item -> new FoodItemDTO(
+                        item.getId(),
+                        item.getName(),
+                        item.getDescription(),
+                        item.getPrice(),
+                        item.getStore() != null ? item.getStore().getStoreName() : null
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(200, dtoList, "Food items fetched successfully")
+        );
     }
+
 
     @DeleteMapping("/food-items/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteFoodItem(@PathVariable Long id) {
