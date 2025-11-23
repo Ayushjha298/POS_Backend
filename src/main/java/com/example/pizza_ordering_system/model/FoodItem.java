@@ -16,19 +16,27 @@ public class FoodItem {
     private String name;
     private String description;
     private BigDecimal price;
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
+
 
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
     private boolean isDeleted = false;
 
+    private String imageUrl;
+
+
     // ---- Constructors ----
     public FoodItem() {
     }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
 
     public boolean isDeleted() { return isDeleted; }
     public void setDeleted(boolean deleted) { isDeleted = deleted; }

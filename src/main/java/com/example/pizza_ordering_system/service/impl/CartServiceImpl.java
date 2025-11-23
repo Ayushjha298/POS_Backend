@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -76,17 +77,50 @@ public class CartServiceImpl implements CartService {
     public void removeCartItem(Long userId, Long cartItemId) {
         cartItemRepository.deleteById(cartItemId);
     }
+
+    // ✅ FIXED METHOD — Orders now store order items
     @Override
     public String confirmOrder(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        Cart cart = cartRepository.findByUser(user).orElseThrow();
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        if (cart.getItems().isEmpty()) {
+            throw new RuntimeException("Cannot place order: Cart is empty");
+        }
+
+        // 1️⃣ Create the order
         Order order = new Order();
         order.setUser(user);
         order.setStatus("PLACED");
+
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        // 2️⃣ Convert all cart items to order items
+        for (CartItem cartItem : cart.getItems()) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setTotalPrice(cartItem.getTotalPrice());
+            orderItem.setFoodItem(cartItem.getFoodItem());
+            orderItem.setOrder(order);  // connect to parent order
+
+            orderItems.add(orderItem);
+        }
+
+        // 3️⃣ Assign order items to order
+        order.setOrderItems(orderItems);
+
+        // 4️⃣ Save the order (CASCADE saves orderItems)
         orderRepository.save(order);
 
-        cartRepository.delete(cart);
+        // 5️⃣ Clear user's cart
+        cart.getItems().clear();
+        cart.setTotalAmount(BigDecimal.ZERO);
+        cartRepository.save(cart);
+
         return "Order placed successfully!";
     }
 
@@ -98,4 +132,3 @@ public class CartServiceImpl implements CartService {
         return "Order cancelled successfully!";
     }
 }
-

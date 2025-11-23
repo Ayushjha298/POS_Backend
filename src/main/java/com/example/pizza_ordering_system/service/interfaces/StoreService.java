@@ -10,4 +10,5 @@ public interface StoreService {
     List<Store> getAllStores();
     Store updateStore(Long id, Store updatedStore);
     void deleteStore(Long id);
+    Store getStoreById(Long id);
 }

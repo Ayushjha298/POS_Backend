@@ -7,6 +7,7 @@ import com.example.pizza_ordering_system.service.interfaces.StoreService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StoreServiceImpl implements StoreService {
@@ -24,12 +25,19 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public List<Store> getAllStores() {
-        List<Store> stores = storeRepository.findAll();
+
+        List<Store> stores = storeRepository.findAll()
+                .stream()
+                .filter(store -> !store.getIsDeleted())  // exclude deleted stores
+                .collect(Collectors.toList());
+
         if (stores.isEmpty()) {
-            throw new ResourceNotFoundException("No stores available");
+            throw new ResourceNotFoundException("No active stores available");
         }
+
         return stores;
     }
+
 
     @Override
     public Store updateStore(Long id, Store updatedStore) {
@@ -43,6 +51,14 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public void deleteStore(Long id) {
-        storeRepository.deleteById(id);
+        Store store = storeRepository.findById(id).orElseThrow();
+        store.setIsDeleted(true);
+        storeRepository.save(store);
+    }
+
+    @Override
+    public Store getStoreById(Long id) {
+        return storeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
     }
 }

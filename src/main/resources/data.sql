@@ -27,45 +27,46 @@
 --(2, 1, 399.00, 1, 2),
 --(3, 1, 349.00, 2, 3);
 -- 🧹 Clean tables before inserting (for development only)
-TRUNCATE TABLE order_items CASCADE;
-TRUNCATE TABLE orders CASCADE;
-TRUNCATE TABLE food_items CASCADE;
-TRUNCATE TABLE stores CASCADE;
-TRUNCATE TABLE users CASCADE;
-
--- 👤 USERS (Admin + Customers)
-INSERT INTO users (id, name, email, password, role)
-VALUES
-(1, 'Ayush', 'admin@gmail.com', '$2a$10$R4fRkK0QzZbYxM5ZPqFKe.y0GzXuzUIEpP8T1ifh/hJ8qVfLGp8gK', 'ROLE_ADMIN'),  -- password: admin123 (BCrypt)
-(2, 'John Doe', 'john@gmail.com', '$2a$10$R4fRkK0QzZbYxM5ZPqFKe.y0GzXuzUIEpP8T1ifh/hJ8qVfLGp8gK', 'ROLE_USER'),
-(3, 'Jane Smith', 'jane@gmail.com', '$2a$10$R4fRkK0QzZbYxM5ZPqFKe.y0GzXuzUIEpP8T1ifh/hJ8qVfLGp8gK', 'ROLE_USER');
-
--- 🏪 STORES
-INSERT INTO stores (id, store_name, location, contact_number)
-VALUES
-(1, 'Domino''s', 'Delhi', '9999999999'),
-(2, 'Pizza Hut', 'Mumbai', '8888888888'),
-(3, 'La Pinoz Pizza', 'Bangalore', '7777777777');
-
--- 🍕 FOOD ITEMS
--- 🍕 FOOD ITEMS (Soft Delete Enabled)
-INSERT INTO food_items (id, name, description, price, store_id, is_deleted)
-VALUES
-(1, 'Cheese Burst Pizza', 'Loaded with cheese and crust', 499.99, 1, false),
-(2, 'Veggie Paradise', 'Topped with onion, capsicum, tomato', 399.99, 1, false),
-(3, 'Chicken Supreme', 'Delicious chicken and cheese', 599.99, 2, false),
-(4, 'Margherita', 'Classic cheese and tomato pizza', 299.99, 3, false);
-
-
--- 📦 ORDERS
-INSERT INTO orders (id, order_date, status, user_id)
-VALUES
-(1, NOW(), 'PLACED', 2),
-(2, NOW(), 'DELIVERED', 3);
-
--- 🍽️ ORDER ITEMS
-INSERT INTO order_items (id, quantity, total_price, order_id, food_item_id)
-VALUES
-(1, 2, 999.98, 1, 1),
-(2, 1, 399.99, 1, 2),
-(3, 3, 1799.97, 2, 3);
+--TRUNCATE TABLE order_items CASCADE;
+--TRUNCATE TABLE orders CASCADE;
+--TRUNCATE TABLE food_items CASCADE;
+--TRUNCATE TABLE stores CASCADE;
+--TRUNCATE TABLE users CASCADE;
+--
+---- 👤 USERS (Admin + Customers)
+--INSERT INTO users (id, name, email, password, role)
+--VALUES
+--(1, 'Ayush', 'admin@gmail.com', '$2a$10$R4fRkK0QzZbYxM5ZPqFKe.y0GzXuzUIEpP8T1ifh/hJ8qVfLGp8gK', 'ROLE_ADMIN'),  -- password: admin123 (BCrypt)
+--(2, 'John Doe', 'john@gmail.com', '$2a$10$R4fRkK0QzZbYxM5ZPqFKe.y0GzXuzUIEpP8T1ifh/hJ8qVfLGp8gK', 'ROLE_USER'),
+--(3, 'Jane Smith', 'jane@gmail.com', '$2a$10$R4fRkK0QzZbYxM5ZPqFKe.y0GzXuzUIEpP8T1ifh/hJ8qVfLGp8gK', 'ROLE_USER');
+--
+---- 🏪 STORES
+--INSERT INTO stores (id, store_name, location, contact_number)
+--VALUES
+--(1, 'Domino''s', 'Delhi', '9999999999'),
+--(2, 'Pizza Hut', 'Mumbai', '8888888888'),
+--(3, 'La Pinoz Pizza', 'Bangalore', '7777777777');
+--
+---- 🍕 FOOD ITEMS
+---- 🍕 FOOD ITEMS (Soft Delete Enabled)
+--INSERT INTO food_items (id, name, description, price, store_id, is_deleted, image_url)
+--VALUES
+--(1, 'Cheese Burst Pizza', 'Loaded with cheese and crust', 499.99, 1, false, 'https://res.cloudinary.com/demo/image/upload/cheese_burst.jpg'),
+--(2, 'Veggie Paradise', 'Topped with onion, capsicum, tomato', 399.99, 1, false, 'https://res.cloudinary.com/demo/image/upload/veggie_paradise.jpg'),
+--(3, 'Chicken Supreme', 'Delicious chicken and cheese', 599.99, 2, false, 'https://res.cloudinary.com/demo/image/upload/chicken_supreme.jpg'),
+--(4, 'Margherita', 'Classic cheese and tomato pizza', 299.99, 3, false, 'https://res.cloudinary.com/demo/image/upload/margherita.jpg');
+--
+--
+--
+---- 📦 ORDERS
+--INSERT INTO orders (id, order_date, status, user_id)
+--VALUES
+--(1, NOW(), 'PLACED', 2),
+--(2, NOW(), 'DELIVERED', 3);
+--
+---- 🍽️ ORDER ITEMS
+--INSERT INTO order_items (id, quantity, total_price, order_id, food_item_id)
+--VALUES
+--(1, 2, 999.98, 1, 1),
+--(2, 1, 399.99, 1, 2),
+--(3, 3, 1799.97, 2, 3);

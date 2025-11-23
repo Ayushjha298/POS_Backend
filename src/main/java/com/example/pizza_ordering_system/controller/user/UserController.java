@@ -20,59 +20,67 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final CartService cartService;
-    private final FoodItemService foodItemService; // ✅ added
+    private final FoodItemService foodItemService;
 
     public UserController(CartService cartService, FoodItemService foodItemService) {
         this.cartService = cartService;
         this.foodItemService = foodItemService;
     }
 
-    // ✅ NEW ENDPOINT: Get all food items
+    // Get all products
     @GetMapping("/food-items")
     public ResponseEntity<ApiResponse<List<FoodItemDTO>>> getAllFoodItems() {
-        List<FoodItem> foodItems = foodItemService.getAllFoodItems();
+        List<FoodItem> items = foodItemService.getAllFoodItems();
 
-        List<FoodItemDTO> simplified = foodItems.stream()
+        List<FoodItemDTO> dtoList = items.stream()
                 .map(item -> new FoodItemDTO(
                         item.getId(),
                         item.getName(),
                         item.getDescription(),
                         item.getPrice(),
-                        item.getStore() != null ? item.getStore().getStoreName() : null
+                        item.getStore() != null ? item.getStore().getStoreName() : null,
+                        item.getImageUrl()
                 ))
                 .collect(Collectors.toList());
 
-        ApiResponse<List<FoodItemDTO>> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                simplified,
-                "Food items fetched successfully"
+        return ResponseEntity.ok(
+                new ApiResponse<>(200, dtoList, "Food items fetched successfully")
+        );
+    }
+
+    // Add item to cart
+    @PostMapping("/cart/add")
+    public ResponseEntity<ApiResponse<CartDTO>> addToCart(@RequestParam Long userId,
+                                                          @RequestParam Long foodItemId,
+                                                          @RequestParam int quantity) {
+
+        Cart cart = cartService.addToCart(userId, foodItemId, quantity);
+
+        CartDTO cartDTO = new CartDTO(
+                cart.getId(),
+                cart.getUser().getName(),
+                cart.getTotalAmount(),
+                cart.getItems().stream().map(item ->
+                        new CartItemDTO(
+                                item.getId(),
+                                item.getFoodItem().getName(),
+                                item.getQuantity(),
+                                item.getTotalPrice()
+                        )).collect(Collectors.toList())
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(200, cartDTO, "Item added to cart"));
     }
 
-
-    @PostMapping("/cart/add")
-    public ResponseEntity<ApiResponse<Cart>> addToCart(@RequestParam Long userId,
-                                                       @RequestParam Long foodItemId,
-                                                       @RequestParam int quantity) {
-        Cart cart = cartService.addToCart(userId, foodItemId, quantity);
-        return ResponseEntity.ok(new ApiResponse<>(200, cart, "Item added to cart"));
-    }
-
+    // Get cart
     @GetMapping("/cart")
     public ResponseEntity<ApiResponse<CartDTO>> getCart(@RequestParam Long userId) {
         Cart cart = cartService.getCart(userId);
 
-        if (cart == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(404, null, "Cart not found"));
-        }
-
         List<CartItemDTO> itemDTOs = cart.getItems().stream()
                 .map(item -> new CartItemDTO(
                         item.getId(),
-                        item.getFoodItem() != null ? item.getFoodItem().getName() : null,
+                        item.getFoodItem().getName(),
                         item.getQuantity(),
                         item.getTotalPrice()
                 ))
@@ -80,21 +88,15 @@ public class UserController {
 
         CartDTO cartDTO = new CartDTO(
                 cart.getId(),
-                cart.getUser() != null ? cart.getUser().getName() : null,
+                cart.getUser().getName(),
                 cart.getTotalAmount(),
                 itemDTOs
         );
 
-        ApiResponse<CartDTO> response = new ApiResponse<>(
-                HttpStatus.OK.value(),
-                cartDTO,
-                "Cart fetched successfully"
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(200, cartDTO, "Cart fetched successfully"));
     }
 
-
+    // Update cart
     @PutMapping("/cart/update")
     public ResponseEntity<ApiResponse<Cart>> updateCartItem(@RequestParam Long userId,
                                                             @RequestParam Long cartItemId,
@@ -103,6 +105,7 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(200, cart, "Cart updated successfully"));
     }
 
+    // Remove cart item
     @DeleteMapping("/cart/remove")
     public ResponseEntity<ApiResponse<String>> removeCartItem(@RequestParam Long userId,
                                                               @RequestParam Long cartItemId) {
@@ -110,11 +113,14 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(200, null, "Item removed from cart"));
     }
 
+    // Place order
     @PostMapping("/order/confirm")
     public ResponseEntity<ApiResponse<String>> confirmOrder(@RequestParam Long userId) {
-        return ResponseEntity.ok(new ApiResponse<>(200, cartService.confirmOrder(userId), "Order confirmed"));
+        String result = cartService.confirmOrder(userId);
+        return ResponseEntity.ok(new ApiResponse<>(200, null, result));
     }
 
+    // Cancel order
     @PutMapping("/order/cancel/{orderId}")
     public ResponseEntity<ApiResponse<String>> cancelOrder(@PathVariable Long orderId) {
         return ResponseEntity.ok(new ApiResponse<>(200, cartService.cancelOrder(orderId), "Order cancelled"));
